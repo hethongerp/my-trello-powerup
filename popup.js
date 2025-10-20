@@ -34,30 +34,23 @@ document.getElementById('save').onclick = async () => {
     const data = await t.get('card', 'shared', 'checklist-data') || {};
     const itemData = data[args.itemId] || { note: '', attachments: [], itemName: args.itemName };
 
-    // Upload files qua server
+    // Upload files (simplified, Trello may need API key/token)
     for (const file of files) {
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const response = await fetch(`https://my-trello-powerup.vercel.app/api/upload?cardId=${t.getContext().card}`, {
-        method: 'POST',
-        body: formData
-      });
-
-      if (!response.ok) throw new Error('Upload thất bại');
-      const result = await response.json();
-      itemData.attachments.push(result.url);
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        itemData.attachments.push(e.target.result);
+      };
+      reader.readAsDataURL(file);
     }
 
     itemData.note = note;
     data[args.itemId] = itemData;
-
     await t.set('card', 'shared', 'checklist-data', data);
-    t.notifyParent('update'); // refresh UI
+    t.notifyParent('update');
     t.closePopup();
   } catch (error) {
-    console.error('Lỗi khi lưu:', error);
-    alert('Có lỗi khi lưu, vui lòng thử lại!');
+    console.error('Error saving data:', error);
+    alert('Lỗi khi lưu, vui lòng thử lại!');
   }
 };
 

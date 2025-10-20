@@ -1,18 +1,19 @@
 // popup.js
 document.addEventListener('DOMContentLoaded', async () => {
-  const t = TrelloPowerUp.iframe();
+const t = window.TrelloPowerUp.iframe();
 
-  const selectEl = document.getElementById('checklist-select');
-  const noteEl = document.getElementById('note');
-  const fileEl = document.getElementById('file');
-  const saveBtn = document.getElementById('save-btn');
+const selectEl = document.getElementById('checklist-select');
+const noteEl = document.getElementById('note');
+const fileEl = document.getElementById('file');
+const saveBtn = document.getElementById('save-btn');
+const statusEl = document.getElementById('status');
 
-  try {
-    // Lấy danh sách checklist items từ card
-    const card = await t.card('checklists[id,name,checkItems[id,name,state,pos]]');
-    const checklists = card.checklists || [];
+// Lấy card với checklists và checkItems
+t.card('checklists[id,name,checkItems[id,name,state]]')
+  .then(card => {
+    if (!card.checklists) return;
 
-    checklists.forEach(cl => {
+    card.checklists.forEach(cl => {
       cl.checkItems.forEach(item => {
         const option = document.createElement('option');
         option.value = item.id;
@@ -20,43 +21,57 @@ document.addEventListener('DOMContentLoaded', async () => {
         selectEl.appendChild(option);
       });
     });
-  } catch (err) {
-    console.error('Lỗi khi load checklist items:', err);
+  });
+
+// Xử lý nút Lưu
+saveBtn.addEventListener('click', () => {
+  const itemId = selectEl.value;
+  const note = noteEl.value.trim();
+  const file = fileEl.files[0];
+
+  if (!itemId) {
+    alert('Chọn 1 item!');
+    return;
   }
 
-  saveBtn.addEventListener('click', async () => {
-    const itemId = selectEl.value;
-    const note = noteEl.value;
-    const file = fileEl.files[0];
+  // Lưu ghi chú
+  if (note) {
+    t.get('card', 'shared', 'checklist-data').then(data => {
+      data = data || {};
+      data[itemId] = data[itemId] || {};
+      data[itemId].note = note;
 
-    if (!itemId) {
-      alert('Vui lòng chọn 1 checklist item.!!!!');
-      return;
-    }
+      t.set('card', 'shared', 'checklist-data', data);
+    });
+  }
 
-    try {
-      // Tick hoàn thành item đã chọn
-      await t.checklistItemToggle(itemId);
+  // Đính kèm file (chỉ gửi URL giả, Trello API không cho upload trực tiếp)
+  if (file) {
+    t.card('id').then(card => {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const content = e.target.result;
+        t.attach({
+          name: file.name,
+          mimeType: file.type,
+          url: 'data:' + file.type + ';base64,' + btoa(content)
+        });
+      };
+      reader.readAsBinaryString(file);
+    });
+  }
 
-      // Lưu dữ liệu vào shared card
-      const sharedData = await t.get('card', 'shared', 'checklist-data') || {};
-      sharedData[itemId] = sharedData[itemId] || {};
-      sharedData[itemId].itemName = selectEl.selectedOptions[0].textContent;
-      sharedData[itemId].note = note;
-
-      // Nếu có file, lưu tên file (thực tế upload file sẽ cần API khác)
-      if (file) {
-        sharedData[itemId].attachments = sharedData[itemId].attachments || [];
-        sharedData[itemId].attachments.push(file.name);
-      }
-
-      await t.set('card', 'shared', 'checklist-data', sharedData);
-
-      t.closePopup();
-      alert('Đã lưu và tick hoàn thành!');
-    } catch (err) {
-      console.error('Lỗi khi lưu data:', err);
-      alert('Có lỗi xảy ra, xem console để biết chi tiết.');
-    }
+  // Tick hoàn thành
+  t.card('checklists').then(card => {
+    card.checklists.forEach(cl => {
+      cl.checkItems.forEach(item => {
+        if (item.id === itemId && item.state !== 'complete') {
+          t.setCheckItemState(itemId, 'complete');
+        }
+      });
+    });
   });
+
+  statusEl.textContent = 'Đã lưu ✅';
+});
 });

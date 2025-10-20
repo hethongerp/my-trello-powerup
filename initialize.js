@@ -10,9 +10,11 @@ window.TrelloPowerUp.initialize({
             text: `📝 ${item.name}`,
             callback: t => t.popup({
               title: `Chi tiết: ${item.name}`,
-              url: t.signUrl('https://my-trello-powerup.vercel.app/popup.html', {itemId: item.id,itemName: item.name}),
-              height: 300,
-              args: { itemId: item.id, itemName: item.name }
+              url: t.signUrl('https://my-trello-powerup.vercel.app/popup.html', {
+                itemId: item.id,
+                itemName: item.name
+              }),
+              height: 300
             })
           });
         });
@@ -20,13 +22,18 @@ window.TrelloPowerUp.initialize({
       return badges;
     });
   },
+
   'card-back-section': function(t) {
     return {
       title: 'Chi tiết Checklist',
-      icon: 'https://my-trello-powerup.vercel.app/icon.png', // Thêm icon nếu có
-      content: { type: 'iframe', url: t.signUrl('https://my-trello-powerup.vercel.app/button.html'),height: 400 }
+      content: {
+        type: 'iframe',
+        url: t.signUrl('https://my-trello-powerup.vercel.app/button.html'),
+        height: 400
+      }
     };
   },
+
   'attachment-sections': function(t) {
     return t.get('card', 'shared', 'checklist-data').then(data => {
       const sections = [];
@@ -35,10 +42,12 @@ window.TrelloPowerUp.initialize({
           if (data[itemId].attachments) {
             sections.push({
               title: `File của ${data[itemId].itemName || 'Checklist Item'}`,
-              icon: 'https://my-trello-powerup.vercel.app/icon.png',
               content: {
                 type: 'iframe',
-                url: t.signUrl('https://my-trello-powerup.vercel.app/popup.html', {itemId, itemName: data[itemId].itemName }),
+                url: t.signUrl('https://my-trello-powerup.vercel.app/popup.html', {
+                  itemId,
+                  itemName: data[itemId].itemName
+                }),
                 height: 200
               }
             });

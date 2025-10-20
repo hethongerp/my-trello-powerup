@@ -1,4 +1,9 @@
 window.TrelloPowerUp.initialize({
+  'on-enable': function(t, options) {
+    console.log('Power-Up đã được bật trên board:', t.getContext().board);
+    return t.set('board', 'shared', 'checklist-data', {}); // khởi tạo data mặc định nếu cần
+  },
+
   'card-detail-badges': function(t) {
     return t.card('checklists').then(card => {
       const badges = [];

@@ -10,7 +10,7 @@ window.TrelloPowerUp.initialize({
             text: `📝 ${item.name}`,
             callback: t => t.popup({
               title: `Chi tiết: ${item.name}`,
-              url: './popup.html',
+              url: t.signUrl('https://my-trello-powerup.vercel.app/popup.html', {itemId: item.id,itemName: item.name}),
               height: 300,
               args: { itemId: item.id, itemName: item.name }
             })
@@ -38,7 +38,7 @@ window.TrelloPowerUp.initialize({
               icon: 'https://my-trello-powerup.vercel.app/icon.png',
               content: {
                 type: 'iframe',
-                url: t.signUrl('./popup.html', { itemId, itemName: data[itemId].itemName }),
+                url: t.signUrl('https://my-trello-powerup.vercel.app/popup.html', {itemId, itemName: data[itemId].itemName }),
                 height: 200
               }
             });

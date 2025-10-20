@@ -1,6 +1,6 @@
 {
   "name": "Checklist Detail Power-Up",
-  "author": "Duy Đạt",
+  "author": "hethongerp",
   "description": "Thêm ghi chú và file cho từng mục trong checklist.",
   "connectorClass": "TrelloPowerUp",
   "url": "https://my-trello-powerup.vercel.app",
@@ -14,3 +14,4 @@
     "scopes": ["read", "write"]
   }
 }
+

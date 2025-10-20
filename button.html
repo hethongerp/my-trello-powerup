@@ -2,27 +2,12 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Checklist Button</title>
+  <title>Chi tiết Checklist</title>
   <script src="https://p.trellocdn.com/power-up.min.js"></script>
-  <style>
-    body { font-family: sans-serif; margin: 10px; }
-    button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
-  </style>
+  <script src="popup.js"></script>
 </head>
 <body>
-  <h3>Checklist Details</h3>
-  <button id="openPopup">Xem chi tiết checklist</button>
-
-  <script>
-    const t = window.TrelloPowerUp.iframe();
-
-    document.getElementById('openPopup').addEventListener('click', () => {
-      t.popup({
-        title: 'Chi tiết checklist',
-        url: t.signUrl('https://my-trello-powerup.vercel.app/popup.html'),
-        height: 400
-      });
-    });
-  </script>
+  <h3>Chọn mục checklist để thao tác</h3>
+  <div id="checklist-container"></div>
 </body>
 </html>

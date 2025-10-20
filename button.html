@@ -41,7 +41,10 @@
             div.querySelector('button').onclick = () => {
               t.popup({
                 title: `Chi tiết: ${item.name}`,
-                url: 'popup.html',
+                url: t.signUrl('https://my-trello-powerup.vercel.app/popup.html', { 
+                  itemId: item.id, 
+                  itemName: item.name 
+                }),
                 height: 300,
                 args: { itemId: item.id, itemName: item.name }
               });
@@ -55,7 +58,7 @@
       }
     }
 
-    t.render(load); // Reload khi card thay đổi
+    t.render(load);
   </script>
 </body>
 </html>

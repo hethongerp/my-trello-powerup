@@ -1,28 +1,31 @@
 const t = window.TrelloPowerUp.iframe();
-
-// Lấy danh sách checklist item truyền từ button.html
-const checklists = JSON.parse(t.arg('checklists') || '[]');
-
 const itemsContainer = document.getElementById('items');
 let selectedItemId = null;
 
-// render danh sách checklist items
-checklists.forEach(cl => {
-  cl.checkItems.forEach(item => {
-    const div = document.createElement('div');
-    const radio = document.createElement('input');
-    radio.type = 'radio';
-    radio.name = 'selectedItem';
-    radio.value = item.id;
+// Lấy danh sách checklist item trực tiếp từ card
+t.card('checklists').then(card => {
+  if (!card.checklists || card.checklists.length === 0) {
+    itemsContainer.textContent = 'Card này chưa có checklist.';
+    return;
+  }
 
-    radio.addEventListener('change', () => {
-      selectedItemId = item.id;
-      loadExistingData(item.id);
+  card.checklists.forEach(cl => {
+    cl.checkItems.forEach(item => {
+      const div = document.createElement('div');
+      const radio = document.createElement('input');
+      radio.type = 'radio';
+      radio.name = 'selectedItem';
+      radio.value = item.id;
+
+      radio.addEventListener('change', () => {
+        selectedItemId = item.id;
+        loadExistingData(item.id);
+      });
+
+      div.appendChild(radio);
+      div.appendChild(document.createTextNode(` ${cl.name} - ${item.name}`));
+      itemsContainer.appendChild(div);
     });
-
-    div.appendChild(radio);
-    div.appendChild(document.createTextNode(` ${cl.name} - ${item.name}`));
-    itemsContainer.appendChild(div);
   });
 });
 
@@ -57,7 +60,6 @@ document.getElementById('save').addEventListener('click', async () => {
   const fileInput = document.getElementById('file');
   const fileName = fileInput.files[0]?.name || null;
 
-  // Lấy dữ liệu cũ
   let data = await t.get('card', 'shared', 'checklist-data');
   data = data || {};
   data[selectedItemId] = data[selectedItemId] || { attachments: [] };

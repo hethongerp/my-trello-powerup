@@ -2,7 +2,11 @@
   "name": "Checklist Detail Power-Up",
   "author": "hethongerp",
   "description": "Thêm ghi chú và file cho từng mục trong checklist.",
-  "connectorClass": "TrelloPowerUp",
+   "connectors": {
+    "iframe": {
+      "url": "https://my-trello-powerup.vercel.app"
+    }
+  },
   "url": "https://my-trello-powerup.vercel.app",
   "capabilities": [
     "card-back-section",
@@ -14,4 +18,5 @@
     "scopes": ["read", "write"]
   }
 }
+
 

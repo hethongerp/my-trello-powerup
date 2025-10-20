@@ -1,18 +1,19 @@
 window.TrelloPowerUp.initialize({
 
-  // 🔹 Khi bật Power-Up
-  'on-enable': function(t){
-    console.log('Power-Up enabled on this board');
-    return t.set('board','private','initialized', true);
+  // Khi bật Power-Up
+  'on-enable': function(t, options){
+    console.log('Power-Up đã được bật trên board', t.board());
+    return t.set('board', 'private', 'powerup-enabled', true);
   },
 
-  // 🔹 Card badges
+  // Badge cho từng checklist item
   'card-detail-badges': function(t) {
     return t.card('checklists').then(card => {
       const badges = [];
       if (!card.checklists || !card.checklists.length) return badges;
 
       card.checklists.forEach(cl => {
+        if(!cl.checkItems) return;
         cl.checkItems.forEach(item => {
           badges.push({
             text: `📝 ${item.name}`,
@@ -31,11 +32,11 @@ window.TrelloPowerUp.initialize({
     });
   },
 
-  // 🔹 Card back section
-  'card-back-section': function(t){
+  // Section hiển thị trong card-back
+  'card-back-section': function(t) {
     return {
       title: 'Chi tiết Checklist',
-      icon: 'https://my-trello-powerup.vercel.app/icon.png', // bắt buộc icon hợp lệ
+      icon: 'https://my-trello-powerup.vercel.app/icon.png',
       content: {
         type: 'iframe',
         url: t.signUrl('https://my-trello-powerup.vercel.app/button.html'),
@@ -44,13 +45,13 @@ window.TrelloPowerUp.initialize({
     };
   },
 
-  // 🔹 Attachment sections
+  // Section attachment
   'attachment-sections': function(t) {
     return t.get('card', 'shared', 'checklist-data').then(data => {
       const sections = [];
-      if(data){
+      if (data) {
         Object.keys(data).forEach(itemId => {
-          if(data[itemId].attachments){
+          if (data[itemId].attachments) {
             sections.push({
               title: `File của ${data[itemId].itemName || 'Checklist Item'}`,
               content: {
@@ -69,26 +70,28 @@ window.TrelloPowerUp.initialize({
     });
   },
 
-  // 🔹 Card buttons
-  'card-buttons': function(t){
+  // Nút trên card
+  'card-buttons': function(t) {
     return [{
-      text: 'Open Checklist Popup',
+      icon: 'https://my-trello-powerup.vercel.app/icon.png',
+      text: 'Checklist Details',
       callback: t => t.popup({
-        title: 'Checklist',
-        url: t.signUrl('https://my-trello-powerup.vercel.app/popup.html'),
-        height: 300
+        title: 'Chi tiết Checklist',
+        url: t.signUrl('https://my-trello-powerup.vercel.app/button.html'),
+        height: 400
       })
     }];
   },
 
-  // 🔹 Board buttons
-  'board-buttons': function(t){
+  // Nút trên board
+  'board-buttons': function(t) {
     return [{
-      text: 'Board Checklist Info',
+      icon: 'https://my-trello-powerup.vercel.app/icon.png',
+      text: 'Board Checklist',
       callback: t => t.popup({
-        title: 'Board Info',
-        url: t.signUrl('https://my-trello-powerup.vercel.app/popup.html'),
-        height: 200
+        title: 'Tổng quan Checklist',
+        url: t.signUrl('https://my-trello-powerup.vercel.app/board.html'),
+        height: 500
       })
     }];
   }

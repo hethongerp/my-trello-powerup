@@ -1,57 +1,26 @@
 const t = window.TrelloPowerUp.iframe();
-const args = t.arg('itemId', 'itemName');
 
-document.getElementById('title').innerText = '✏️ ' + args.itemName;
+// Hiển thị thông tin checklist item
+const urlParams = new URLSearchParams(window.location.search);
+const itemId = urlParams.get('itemId');
+const itemName = urlParams.get('itemName');
 
-async function loadData() {
-  const data = await t.get('card', 'shared', 'checklist-data') || {};
-  const itemData = data[args.itemId] || { note: '', attachments: [] };
-  document.getElementById('note').value = itemData.note || '';
+document.getElementById('item-info').textContent = itemName || 'Checklist Item';
 
-  const attachmentsEl = document.getElementById('attachments');
-  attachmentsEl.innerHTML = '';
-  if (itemData.attachments) {
-    itemData.attachments.forEach(url => {
-      if (url.endsWith('.pdf')) {
-        const link = document.createElement('a');
-        link.href = url;
-        link.innerText = 'Xem PDF';
-        link.target = '_blank';
-        attachmentsEl.appendChild(link);
-      } else {
-        const img = document.createElement('img');
-        img.src = url;
-        attachmentsEl.appendChild(img);
-      }
-    });
-  }
-}
+// Lưu ghi chú và file
+document.getElementById('save-btn').addEventListener('click', () => {
+  const note = document.getElementById('note').value;
+  const attachmentInput = document.getElementById('attachment');
+  const attachment = attachmentInput.files[0];
 
-document.getElementById('save').onclick = async () => {
-  try {
-    const note = document.getElementById('note').value;
-    const files = document.getElementById('file-upload').files;
-    const data = await t.get('card', 'shared', 'checklist-data') || {};
-    const itemData = data[args.itemId] || { note: '', attachments: [], itemName: args.itemName };
-
-    // Upload files (simplified, Trello may need API key/token)
-    for (const file of files) {
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        itemData.attachments.push(e.target.result);
-      };
-      reader.readAsDataURL(file);
-    }
-
-    itemData.note = note;
-    data[args.itemId] = itemData;
-    await t.set('card', 'shared', 'checklist-data', data);
-    t.notifyParent('update');
+  t.get('card', 'shared', 'checklist-data').then(data => {
+    data = data || {};
+    data[itemId] = data[itemId] || {};
+    data[itemId].itemName = itemName;
+    data[itemId].note = note;
+    if (attachment) data[itemId].attachments = attachment.name; // Chỉ lưu tên file demo
+    return t.set('card', 'shared', 'checklist-data', data);
+  }).then(() => {
     t.closePopup();
-  } catch (error) {
-    console.error('Error saving data:', error);
-    alert('Lỗi khi lưu, vui lòng thử lại!');
-  }
-};
-
-loadData();
+  });
+});

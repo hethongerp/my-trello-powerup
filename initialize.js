@@ -1,9 +1,12 @@
 window.TrelloPowerUp.initialize({
-  'on-enable': function(t, options) {
+
+  // Khi Power-Up được bật trên board
+  'on-enable': function(t) {
     console.log('Power-Up đã được bật trên board:', t.getContext().board);
-    return t.set('board', 'shared', 'checklist-data', {}); // khởi tạo data mặc định nếu cần
+    return t.set('board', 'shared', 'enabled', true);
   },
 
+  // Badge hiển thị trên card cho từng checklist item
   'card-detail-badges': function(t) {
     return t.card('checklists').then(card => {
       const badges = [];
@@ -28,6 +31,7 @@ window.TrelloPowerUp.initialize({
     });
   },
 
+  // Phần nút / iframe hiển thị trên mặt sau của card
   'card-back-section': function(t) {
     return {
       title: 'Chi tiết Checklist',
@@ -39,12 +43,13 @@ window.TrelloPowerUp.initialize({
     };
   },
 
+  // Section hiển thị file đính kèm từ checklist item
   'attachment-sections': function(t) {
     return t.get('card', 'shared', 'checklist-data').then(data => {
       const sections = [];
       if (data) {
         Object.keys(data).forEach(itemId => {
-          if (data[itemId].attachments) {
+          if (data[itemId].attachments && data[itemId].attachments.length) {
             sections.push({
               title: `File của ${data[itemId].itemName || 'Checklist Item'}`,
               content: {
@@ -62,4 +67,5 @@ window.TrelloPowerUp.initialize({
       return sections;
     });
   }
+
 });

@@ -1,25 +1,8 @@
 window.TrelloPowerUp.initialize({
-
-  // Nút trong card để mở popup chi tiết checklist
-  'card-buttons': function(t) {
-    return [{
-      text: 'Chi tiết Checklist',
-      icon: 'https://cdn-icons-png.flaticon.com/512/61/61456.png', // icon tùy chỉnh
-      callback: function(t) {
-        return t.popup({
-          title: 'Chi tiết Checklist',
-          url: t.signUrl('https://my-trello-powerup.vercel.app/popup.html'),
-          height: 400
-        });
-      }
-    }];
-  },
-
-  // Badge hiển thị tên các mục checklist trên card
   'card-detail-badges': function(t) {
-    return t.card('checklists').then(card => {
+    return t.card('checklists[id,name,checkItems[id,name,state]]').then(card => {
       const badges = [];
-      if (!card.checklists) return badges;
+      if (!card.checklists || !card.checklists.length) return badges;
 
       card.checklists.forEach(cl => {
         cl.checkItems.forEach(item => {
@@ -41,7 +24,40 @@ window.TrelloPowerUp.initialize({
     });
   },
 
-  // Section hiển thị attachment nếu đã lưu trên checklist
+  'card-back-section': function(t) {
+    // Hiển thị danh sách checkItems ngay trong card-back
+    return t.card('checklists[id,name,checkItems[id,name,state]]').then(card => {
+      let html = '<div style="padding:5px;">';
+      if (card.checklists && card.checklists.length) {
+        card.checklists.forEach(cl => {
+          html += `<b>${cl.name}</b><ul>`;
+          cl.checkItems.forEach(item => {
+            html += `<li>${item.state === 'complete' ? '✅' : '⬜'} 
+                      <a href="#" onclick="window.TrelloPowerUp.iframe().popup({
+                        title:'Chi tiết: ${item.name}',
+                        url:'https://my-trello-powerup.vercel.app/popup.html?itemId=${item.id}&itemName=${encodeURIComponent(item.name)}',
+                        height:300
+                      })">${item.name}</a></li>`;
+          });
+          html += '</ul>';
+        });
+      } else {
+        html += 'Card chưa có checklist.';
+      }
+      html += '</div>';
+
+      return {
+        title: 'Chi tiết Checklist',
+        icon: 'https://cdn-icons-png.flaticon.com/512/2910/2910768.png', // Cần icon hợp lệ
+        content: {
+          type: 'iframe',
+          url: t.signUrl('data:text/html,' + encodeURIComponent(html)),
+          height: 300
+        }
+      };
+    });
+  },
+
   'attachment-sections': function(t) {
     return t.get('card', 'shared', 'checklist-data').then(data => {
       const sections = [];
@@ -66,22 +82,7 @@ window.TrelloPowerUp.initialize({
     });
   },
 
-  // Card back section hiển thị nút mở chi tiết checklist
-  'card-back-section': function(t) {
-    return {
-      title: 'Chi tiết Checklist',
-      icon: 'https://cdn-icons-png.flaticon.com/512/61/61456.png',
-      content: {
-        type: 'iframe',
-        url: t.signUrl('https://my-trello-powerup.vercel.app/button.html'),
-        height: 400
-      }
-    };
-  },
-
-  // Khi bật Power-Up
-  'on-enable': function(t) {
-    console.log('Power-Up đã được bật trên board:', t.board());
-    return Promise.resolve();
+  'on-enable': function(t, options) {
+    console.log('Power-Up đã được bật trên board:', options.board);
   }
 });

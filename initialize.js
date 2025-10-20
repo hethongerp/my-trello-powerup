@@ -24,7 +24,7 @@ window.TrelloPowerUp.initialize({
     return {
       title: 'Chi tiết Checklist',
       icon: 'https://my-trello-powerup.vercel.app/icon.png', // Thêm icon nếu có
-      content: { type: 'iframe', url: t.signUrl('./button.html'), height: 400 }
+      content: { type: 'iframe', url: t.signUrl('https://my-trello-powerup.vercel.app/button.html'),height: 400 }
     };
   },
   'attachment-sections': function(t) {

@@ -1,52 +1,79 @@
 const t = window.TrelloPowerUp.iframe();
 
-// Bước authorize
-t.authorize({
-  type: 'popup',
-  name: 'Checklist Detail Power-Up',
-  scope: { read: true, write: true },
-  expiration: 'never',
-  success: () => console.log('Authorized')
+// Lấy danh sách checklist item truyền từ button.html
+const checklists = JSON.parse(t.arg('checklists') || '[]');
+
+const itemsContainer = document.getElementById('items');
+let selectedItemId = null;
+
+// render danh sách checklist items
+checklists.forEach(cl => {
+  cl.checkItems.forEach(item => {
+    const div = document.createElement('div');
+    const radio = document.createElement('input');
+    radio.type = 'radio';
+    radio.name = 'selectedItem';
+    radio.value = item.id;
+
+    radio.addEventListener('change', () => {
+      selectedItemId = item.id;
+      loadExistingData(item.id);
+    });
+
+    div.appendChild(radio);
+    div.appendChild(document.createTextNode(` ${cl.name} - ${item.name}`));
+    itemsContainer.appendChild(div);
+  });
 });
 
-// Lấy thông tin item từ URL
-const urlParams = new URLSearchParams(window.location.search);
-const itemId = urlParams.get('itemId');
-const itemName = urlParams.get('itemName');
+// Load dữ liệu cũ (ghi chú + file) nếu có
+function loadExistingData(itemId) {
+  t.get('card', 'shared', 'checklist-data').then(data => {
+    if (data && data[itemId]) {
+      document.getElementById('note').value = data[itemId].note || '';
+      const attachDiv = document.getElementById('existing-attachments');
+      if (attachDiv) attachDiv.remove();
 
-document.getElementById('item-info').textContent = itemName || 'Checklist Item';
+      if (data[itemId].attachments?.length) {
+        const div = document.createElement('div');
+        div.id = 'existing-attachments';
+        div.className = 'attachment';
+        div.textContent = 'Đã đính kèm: ' + data[itemId].attachments.join(', ');
+        document.body.insertBefore(div, document.getElementById('file'));
+      }
+    } else {
+      document.getElementById('note').value = '';
+      const attachDiv = document.getElementById('existing-attachments');
+      if (attachDiv) attachDiv.remove();
+    }
+  });
+}
 
-// Xử lý lưu note và upload file
-document.getElementById('save-btn').addEventListener('click', async () => {
+// Lưu dữ liệu + tick item
+document.getElementById('save').addEventListener('click', async () => {
+  if (!selectedItemId) return alert('Chọn 1 checklist item!');
+
   const note = document.getElementById('note').value;
-  const attachmentInput = document.getElementById('attachment');
-  const file = attachmentInput.files[0];
+  const fileInput = document.getElementById('file');
+  const fileName = fileInput.files[0]?.name || null;
 
-  const data = await t.get('card', 'shared', 'checklist-data') || {};
-  data[itemId] = data[itemId] || {};
-  data[itemId].itemName = itemName;
-  data[itemId].note = note;
+  // Lấy dữ liệu cũ
+  let data = await t.get('card', 'shared', 'checklist-data');
+  data = data || {};
+  data[selectedItemId] = data[selectedItemId] || { attachments: [] };
+  data[selectedItemId].note = note;
+  if (fileName) data[selectedItemId].attachments.push(fileName);
+
   await t.set('card', 'shared', 'checklist-data', data);
 
-  if (file) {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('name', file.name);
-
-    const cardId = await t.card('id').then(c => c.id);
-    const token = await t.get('member', 'private', 'token'); // token vừa được authorize
-    const key = 'a1c195d7df98af678d63113440ce2f49';
-
-    fetch(`https://api.trello.com/1/cards/${cardId}/attachments?key=${key}&token=${token}`, {
-      method: 'POST',
-      body: formData
-    }).then(res => res.json())
-      .then(() => t.closePopup())
-      .catch(err => {
-        console.error('Upload failed', err);
-        t.closePopup();
-      });
-  } else {
-    t.closePopup();
+  // tick item
+  const card = await t.card('checklists');
+  for (const cl of card.checklists) {
+    const item = cl.checkItems.find(i => i.id === selectedItemId);
+    if (item && item.state !== 'complete') {
+      await t.setCheckItemState(item.id, 'complete');
+    }
   }
+
+  t.closePopup();
 });

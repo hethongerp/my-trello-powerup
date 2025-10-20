@@ -2,16 +2,15 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Popup Checklist Item</title>
+  <title>Popup Checklist</title>
   <script src="https://p.trellocdn.com/power-up.min.js"></script>
-  <style>
-    body { font-family: sans-serif; margin: 10px; }
-  </style>
+  <script src="popup.js"></script>
 </head>
 <body>
-  <h3 id="itemTitle">Chi tiết</h3>
-  <div id="content"></div>
-
-  <script src="popup.js"></script>
+  <h3>Chi tiết Checklist Item</h3>
+  <div id="item-info"></div>
+  <textarea id="note" placeholder="Thêm ghi chú..."></textarea>
+  <input type="file" id="attachment">
+  <button id="save-btn">Lưu</button>
 </body>
 </html>

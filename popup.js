@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const file = fileEl.files[0];
 
     if (!itemId) {
-      alert('Vui lòng chọn 1 checklist item.');
+      alert('Vui lòng chọn 1 checklist item.!!!!');
       return;
     }
 

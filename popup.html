@@ -1,16 +1,21 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Popup Checklist</title>
-  <script src="https://p.trellocdn.com/power-up.min.js"></script>
-  <script src="popup.js"></script>
+  <title>Chi tiết Checklist Item</title>
+  <style>
+    body { font-family: sans-serif; padding: 10px; }
+    #items div { margin-bottom: 5px; }
+    .attachment { font-size: 0.9em; color: #555; }
+  </style>
 </head>
 <body>
-  <h3>Chi tiết Checklist Item</h3>
-  <div id="item-info"></div>
-  <textarea id="note" placeholder="Thêm ghi chú..."></textarea>
-  <input type="file" id="attachment">
-  <button id="save-btn">Lưu</button>
+  <h3>Checklist công việc</h3>
+  <div id="items"></div>
+  <textarea id="note" placeholder="Nhập ghi chú" rows="3" style="width:100%;"></textarea><br>
+  <input type="file" id="file"><br><br>
+  <button id="save">Lưu</button>
+
+  <script src="https://p.trellocdn.com/power-up.min.js"></script>
+  <script src="popup.js"></script>
 </body>
 </html>

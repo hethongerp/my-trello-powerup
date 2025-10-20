@@ -1,22 +1,23 @@
 {
   "name": "Checklist Detail Power-Up",
   "author": "hethongerp",
-  "description": "Thêm ghi chú và tệp đính kèm cho từng mục trong checklist.",
+  "description": "Thêm ghi chú và file cho từng mục trong checklist.",
+  "icon": {
+    "url": "https://my-trello-powerup.vercel.app/icon.png"
+  },
   "url": "https://my-trello-powerup.vercel.app",
+  "capabilities": [
+    "board-buttons",
+    "card-back-section",
+    "card-detail-badges",
+    "attachment-sections",
+    "on-enable"
+  ],
   "connectors": {
     "iframe": {
       "url": "https://my-trello-powerup.vercel.app"
     }
   },
-  "icon": {
-    "url": "https://cdn-icons-png.flaticon.com/512/992/992651.png"
-  },
-  "capabilities": [
-    "card-buttons",
-    "card-back-section",
-    "card-detail-badges",
-    "attachment-sections"
-  ],
   "authorization": {
     "scopes": ["read", "write"]
   },

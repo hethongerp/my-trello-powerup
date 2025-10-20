@@ -41,12 +41,11 @@
             div.querySelector('button').onclick = () => {
               t.popup({
                 title: `Chi tiết: ${item.name}`,
-                url: t.signUrl('https://my-trello-powerup.vercel.app/popup.html', { 
-                  itemId: item.id, 
-                  itemName: item.name 
+                url: t.signUrl('https://my-trello-powerup.vercel.app/popup.html', {
+                  itemId: item.id,
+                  itemName: item.name
                 }),
-                height: 300,
-                args: { itemId: item.id, itemName: item.name }
+                height: 300
               });
             };
             listEl.appendChild(div);

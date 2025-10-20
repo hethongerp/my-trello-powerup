@@ -1,22 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
+  <title>Popup</title>
   <script src="https://p.trellocdn.com/power-up.min.js"></script>
-  <script src="popup.js"></script>
-  <style>
-    body { font-family: sans-serif; padding: 10px; }
-    textarea { width: 100%; height: 80px; margin-bottom: 10px; }
-    button { padding: 6px 12px; background: #0052cc; color: white; border: none; cursor: pointer; }
-    #attachments img { max-width: 100px; margin: 5px; }
-    #attachments a { display: block; margin: 5px; }
-  </style>
 </head>
 <body>
-  <h3 id="title"></h3>
-  <textarea id="note" placeholder="Nhập nội dung chi tiết..."></textarea>
-  <input type="file" id="file-upload" accept="image/*,.pdf" multiple>
-  <div id="attachments"></div>
-  <button id="save">💾 Lưu lại</button>
+  <h3>Popup Power-Up</h3>
+  <div id="content">Nội dung checklist sẽ hiển thị ở đây</div>
 </body>
 </html>

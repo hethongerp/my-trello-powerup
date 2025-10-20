@@ -1,82 +1,55 @@
-// popup.js
 document.addEventListener('DOMContentLoaded', async () => {
-  const dropdown = document.createElement('select');
-  dropdown.id = 'checklist-items';
-  const defaultOption = document.createElement('option');
-  defaultOption.value = '';
-  defaultOption.textContent = '-- Chọn --';
-  dropdown.appendChild(defaultOption);
+  const t = window.TrelloPowerUp.iframe();
 
-  const noteInput = document.createElement('textarea');
-  noteInput.id = 'note';
-  noteInput.placeholder = 'Ghi chú...';
+  const select = document.getElementById('checklist-select');
+  const noteInput = document.getElementById('note');
+  const fileInput = document.getElementById('file');
+  const saveBtn = document.getElementById('save-btn');
 
-  const fileInput = document.createElement('input');
-  fileInput.type = 'file';
-  fileInput.id = 'attachment';
-
-  const saveButton = document.createElement('button');
-  saveButton.textContent = 'Lưu';
-
-  const container = document.getElementById('checklist-container');
-  container.appendChild(dropdown);
-  container.appendChild(document.createElement('br'));
-  container.appendChild(noteInput);
-  container.appendChild(document.createElement('br'));
-  container.appendChild(fileInput);
-  container.appendChild(document.createElement('br'));
-  container.appendChild(saveButton);
-
-  try {
-    // Lấy card với checklists
-    const t = window.TrelloPowerUp.iframe();
+  // Load tất cả checklist items từ card
+  async function loadChecklistItems() {
     const card = await t.card('checklists');
-    const checklists = card.checklists || [];
+    select.innerHTML = '<option value="">-- Chọn --</option>';
 
-    // Nạp các checklist items vào dropdown
-    checklists.forEach(cl => {
-      cl.checkItems?.forEach(item => {
-        const option = document.createElement('option');
-        option.value = item.id;
-        option.textContent = item.name;
-        dropdown.appendChild(option);
+    if (card.checklists) {
+      card.checklists.forEach(cl => {
+        cl.checkItems.forEach(item => {
+          const option = document.createElement('option');
+          option.value = item.id;
+          option.textContent = item.name;
+          select.appendChild(option);
+        });
       });
-    });
-
-    // Xử lý lưu
-    saveButton.addEventListener('click', async () => {
-      const selectedId = dropdown.value;
-      if (!selectedId) {
-        alert('Vui lòng chọn 1 item.');
-        return;
-      }
-
-      // Thêm ghi chú
-      const note = noteInput.value;
-      if (note) {
-        await t.set('card', 'shared', `checklist-note-${selectedId}`, note);
-      }
-
-      // Tick item hoàn thành
-      for (const cl of checklists) {
-        const item = cl.checkItems.find(i => i.id === selectedId);
-        if (item && item.state !== 'complete') {
-          await t.checklistItem(cl.id, item.id, { state: 'complete' });
-        }
-      }
-
-      // File đính kèm (tạm lưu file name)
-      const file = fileInput.files[0];
-      if (file) {
-        await t.set('card', 'shared', `checklist-attachment-${selectedId}`, file.name);
-      }
-
-      alert('Đã lưu!');
-    });
-  } catch (err) {
-    console.error('Không thể lấy checklist:', err);
-    const msg = document.createElement('p');
-    msg.textContent = 'Không thể lấy checklist.';
-    container.appendChild(msg);
+    }
   }
+
+  await loadChecklistItems();
+
+  // Khi click nút Lưu
+  saveBtn.addEventListener('click', async () => {
+    const itemId = select.value;
+    if (!itemId) {
+      alert('Vui lòng chọn 1 item!');
+      return;
+    }
+
+    // Lưu ghi chú vào shared storage của card
+    const data = await t.get('card', 'shared', 'checklist-data') || {};
+    if (!data[itemId]) data[itemId] = { attachments: [], notes: '' };
+    data[itemId].notes = noteInput.value;
+
+    // Lưu file (chỉ lưu tên file ở đây, có thể upload thực tế lên server)
+    if (fileInput.files.length > 0) {
+      const file = fileInput.files[0];
+      data[itemId].attachments.push(file.name);
+    }
+
+    await t.set('card', 'shared', 'checklist-data', data);
+
+    // Tick checklist item hoàn thành
+    await t.checklistItem(itemId, { state: 'complete' });
+
+    alert('Đã lưu thành công!');
+    t.closePopup();
+  });
 });

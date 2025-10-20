@@ -4,25 +4,33 @@
   <meta charset="UTF-8">
   <title>Chi tiết Checklist Item</title>
   <script src="https://p.trellocdn.com/power-up.min.js"></script>
-  <script src="popup.js"></script>
+  <script src="popup.js" defer></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 10px;
+      max-width: 400px;
+    }
+    select, textarea, input, button {
+      width: 100%;
+      margin: 5px 0;
+      box-sizing: border-box;
+    }
+    button {
+      cursor: pointer;
+      padding: 5px 10px;
+      background-color: #0079bf;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+    }
+    button:hover {
+      background-color: #026aa7;
+    }
+  </style>
 </head>
 <body>
   <h3>Chi tiết Checklist Item</h3>
-
-  <label for="checklist-dropdown">Chọn item:</label>
-  <select id="checklist-dropdown">
-    <option>-- Chọn --</option>
-  </select>
-
-  <br><br>
-  <label for="note">Ghi chú:</label><br>
-  <textarea id="note" rows="4" cols="30"></textarea>
-
-  <br><br>
-  <label for="file-input">File đính kèm:</label><br>
-  <input type="file" id="file-input" multiple>
-
-  <br><br>
-  <button id="save-btn">Lưu</button>
+  <div id="checklist-container"></div>
 </body>
 </html>

@@ -13,8 +13,7 @@
     "card-detail-badges",
     "attachment-sections",
     "card-buttons",
-    "board-buttons",
-    "on-enable"
+    "board-buttons"
   ],
   "public": true,
   "authorization": {

@@ -3,13 +3,15 @@ const itemsContainer = document.getElementById('items');
 let selectedItemId = null;
 
 // Lấy danh sách checklist item trực tiếp từ card
-t.card('checklists').then(card => {
-  if (!card.checklists || card.checklists.length === 0) {
+t.card('checklists[id,name,checkItems[id,name,state]]').then(card => {
+  const itemsContainer = document.getElementById('items');
+  if (!card.checklists || !card.checklists.length) {
     itemsContainer.textContent = 'Card này chưa có checklist.';
     return;
   }
 
   card.checklists.forEach(cl => {
+    if (!cl.checkItems) return;
     cl.checkItems.forEach(item => {
       const div = document.createElement('div');
       const radio = document.createElement('input');
@@ -28,6 +30,7 @@ t.card('checklists').then(card => {
     });
   });
 });
+
 
 // Load dữ liệu cũ (ghi chú + file) nếu có
 function loadExistingData(itemId) {

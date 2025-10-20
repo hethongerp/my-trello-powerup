@@ -1,12 +1,12 @@
 window.TrelloPowerUp.initialize({
 
-  // Khi Power-Up được bật trên board
-  'on-enable': function(t) {
-    console.log('Power-Up đã được bật trên board:', t.getContext().board);
-    return t.set('board', 'shared', 'enabled', true);
+  // 🔹 Khi bật Power-Up
+  'on-enable': function(t){
+    console.log('Power-Up enabled on this board');
+    return t.set('board','private','initialized', true);
   },
 
-  // Badge hiển thị trên card cho từng checklist item
+  // 🔹 Card badges
   'card-detail-badges': function(t) {
     return t.card('checklists').then(card => {
       const badges = [];
@@ -31,10 +31,11 @@ window.TrelloPowerUp.initialize({
     });
   },
 
-  // Phần nút / iframe hiển thị trên mặt sau của card
-  'card-back-section': function(t) {
+  // 🔹 Card back section
+  'card-back-section': function(t){
     return {
       title: 'Chi tiết Checklist',
+      icon: 'https://my-trello-powerup.vercel.app/icon.png', // bắt buộc icon hợp lệ
       content: {
         type: 'iframe',
         url: t.signUrl('https://my-trello-powerup.vercel.app/button.html'),
@@ -43,13 +44,13 @@ window.TrelloPowerUp.initialize({
     };
   },
 
-  // Section hiển thị file đính kèm từ checklist item
+  // 🔹 Attachment sections
   'attachment-sections': function(t) {
     return t.get('card', 'shared', 'checklist-data').then(data => {
       const sections = [];
-      if (data) {
+      if(data){
         Object.keys(data).forEach(itemId => {
-          if (data[itemId].attachments && data[itemId].attachments.length) {
+          if(data[itemId].attachments){
             sections.push({
               title: `File của ${data[itemId].itemName || 'Checklist Item'}`,
               content: {
@@ -66,6 +67,30 @@ window.TrelloPowerUp.initialize({
       }
       return sections;
     });
+  },
+
+  // 🔹 Card buttons
+  'card-buttons': function(t){
+    return [{
+      text: 'Open Checklist Popup',
+      callback: t => t.popup({
+        title: 'Checklist',
+        url: t.signUrl('https://my-trello-powerup.vercel.app/popup.html'),
+        height: 300
+      })
+    }];
+  },
+
+  // 🔹 Board buttons
+  'board-buttons': function(t){
+    return [{
+      text: 'Board Checklist Info',
+      callback: t => t.popup({
+        title: 'Board Info',
+        url: t.signUrl('https://my-trello-powerup.vercel.app/popup.html'),
+        height: 200
+      })
+    }];
   }
 
 });
